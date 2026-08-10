@@ -1,0 +1,164 @@
+microfinance-api/
+│
+├── prisma/
+│   ├── migrations/
+│   │   └── 20260811000000_init/
+│   │       └── migration.sql
+│   │
+│   ├── schema.prisma
+│   └── seed.ts
+│
+├── src/
+│   │
+│   ├── main.ts
+│   ├── app.module.ts
+│   │
+│   ├── config/
+│   │   ├── configuration.ts
+│   │   ├── database.config.ts
+│   │   └── validation.ts
+│   │
+│   ├── database/
+│   │   ├── database.module.ts
+│   │   └── prisma.service.ts
+│   │
+│   ├── common/
+│   │   │
+│   │   ├── decorators/
+│   │   │   ├── current-user.decorator.ts
+│   │   │   └── public.decorator.ts
+│   │   │
+│   │   ├── filters/
+│   │   │   └── http-exception.filter.ts
+│   │   │
+│   │   ├── guards/
+│   │   │   ├── jwt-auth.guard.ts
+│   │   │   └── roles.guard.ts
+│   │   │
+│   │   ├── interceptors/
+│   │   │   ├── bigint.interceptor.ts
+│   │   │   └── logging.interceptor.ts
+│   │   │
+│   │   ├── pipes/
+│   │   │   └── validation.pipe.ts
+│   │   │
+│   │   ├── middleware/
+│   │   │   └── request-id.middleware.ts
+│   │   │
+│   │   ├── constants/
+│   │   │   └── app.constants.ts
+│   │   │
+│   │   ├── enums/
+│   │   │   ├── user-role.enum.ts
+│   │   │   └── status.enum.ts
+│   │   │
+│   │   └── utils/
+│   │       ├── pagination.util.ts
+│   │       └── date.util.ts
+│   │
+│   ├── infrastructure/
+│   │   │
+│   │   ├── snowflake/
+│   │   │   ├── snowflake.module.ts
+│   │   │   └── snowflake.service.ts
+│   │   │
+│   │   ├── logger/
+│   │   │   ├── logger.module.ts
+│   │   │   └── logger.service.ts
+│   │   │
+│   │   ├── redis/
+│   │   │   ├── redis.module.ts
+│   │   │   └── redis.service.ts
+│   │   │
+│   │   └── messaging/
+│   │       ├── messaging.module.ts
+│   │       └── messaging.service.ts
+│   │
+│   ├── modules/
+│   │   │
+│   │   ├── auth/
+│   │   │   ├── auth.module.ts
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── auth.service.ts
+│   │   │   │
+│   │   │   ├── dto/
+│   │   │   │   ├── login.dto.ts
+│   │   │   │   ├── refresh-token.dto.ts
+│   │   │   │   └── verify-otp.dto.ts
+│   │   │   │
+│   │   │   ├── guards/
+│   │   │   │   └── jwt.guard.ts
+│   │   │   │
+│   │   │   └── strategies/
+│   │   │       └── jwt.strategy.ts
+│   │   │
+│   │   ├── users/
+│   │   │   ├── users.module.ts
+│   │   │   ├── users.controller.ts
+│   │   │   ├── users.service.ts
+│   │   │   ├── dto/
+│   │   │   │   ├── create-user.dto.ts
+│   │   │   │   └── update-user.dto.ts
+│   │   │   └── types/
+│   │   │       └── user.type.ts
+│   │   │
+│   │   ├── customers/
+│   │   │   ├── customers.module.ts
+│   │   │   ├── customers.controller.ts
+│   │   │   ├── customers.service.ts
+│   │   │   ├── dto/
+│   │   │   │   ├── create-customer.dto.ts
+│   │   │   │   ├── update-customer.dto.ts
+│   │   │   │   └── customer-query.dto.ts
+│   │   │   └── types/
+│   │   │       └── customer.type.ts
+│   │   │
+│   │   ├── loans/
+│   │   │   ├── loans.module.ts
+│   │   │   ├── loans.controller.ts
+│   │   │   ├── loans.service.ts
+│   │   │   ├── dto/
+│   │   │   │   ├── create-loan.dto.ts
+│   │   │   │   ├── approve-loan.dto.ts
+│   │   │   │   └── loan-query.dto.ts
+│   │   │   └── types/
+│   │   │       └── loan.type.ts
+│   │   │
+│   │   ├── repayments/
+│   │   │   ├── repayments.module.ts
+│   │   │   ├── repayments.controller.ts
+│   │   │   ├── repayments.service.ts
+│   │   │   └── dto/
+│   │   │       └── create-repayment.dto.ts
+│   │   │
+│   │   ├── transactions/
+│   │   │   ├── transactions.module.ts
+│   │   │   ├── transactions.controller.ts
+│   │   │   ├── transactions.service.ts
+│   │   │   └── dto/
+│   │   │       └── transaction-query.dto.ts
+│   │   │
+│   │   └── health/
+│   │       ├── health.module.ts
+│   │       └── health.controller.ts
+│   │
+│   └── shared/
+│       ├── interfaces/
+│       │   └── api-response.interface.ts
+│       └── types/
+│           └── pagination.type.ts
+│
+├── test/
+│   ├── app.e2e-spec.ts
+│   └── jest-e2e.json
+│
+├── .env
+├── .env.example
+├── .gitignore
+├── docker-compose.yml
+├── Dockerfile
+├── nest-cli.json
+├── package.json
+├── tsconfig.json
+├── tsconfig.build.json
+└── README.md
