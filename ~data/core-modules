@@ -1,0 +1,645 @@
+1. Authentication & Access Control
+Login / Logout
+JWT access + refresh tokens
+User management
+Roles & permissions
+Branch-based access
+Maker / Checker approval
+Password management
+Session management
+Audit logs
+
+2. Organization & Branch Management
+Organization
+ ├── Regions
+ ├── Branches
+ ├── Departments
+ └── Employees
+
+Features:
+
+Company configuration
+Branch management
+Branch code
+Branch address
+Branch operating hours
+Staff assignment
+Branch cash account
+Branch limits
+
+3. Customer / Member Management
+
+This should be one of your core modules.
+
+Customer registration
+Customer number
+Individual / business customer
+Personal information
+Contact information
+Address
+Employment information
+Income information
+Emergency contact
+Family information
+Customer status
+Customer profile
+Customer documents
+
+Example:
+
+Customer
+ ├── Personal Information
+ ├── Contact Information
+ ├── Address
+ ├── Employment
+ ├── KYC
+ ├── Documents
+ ├── Bank Accounts
+ ├── Loans
+ ├── Savings
+ └── Transactions
+
+ 4. KYC / Customer Due Diligence
+KYC registration
+NRC / Passport / ID
+ID verification
+Address verification
+Customer photo
+Signature
+Document upload
+Document expiry
+Risk classification
+KYC status
+
+Statuses:
+
+PENDING
+VERIFIED
+REJECTED
+EXPIRED
+
+5. Customer Group / Center Management
+
+Very important for group-based microfinance.
+
+Group / Center creation
+Group leader
+Group members
+Group meetings
+Group address
+Group loan
+Joint liability
+Group savings
+Meeting schedule
+
+Example:
+
+Center
+   ├── Group A
+   │    ├── Member 001
+   │    ├── Member 002
+   │    └── Member 003
+   │
+   └── Group B
+        ├── Member 004
+        └── Member 005
+
+6. Loan Product Management
+
+Define the products your institution offers.
+
+Examples:
+
+Daily Loan
+Weekly Loan
+Monthly Loan
+Group Loan
+Individual Loan
+Emergency Loan
+Business Loan
+Agricultural Loan
+
+Product configuration:
+
+Product code
+Product name
+Minimum amount
+Maximum amount
+Interest rate
+Interest method
+Loan term
+Repayment frequency
+Grace period
+Processing fee
+Late fee
+Penalty
+Collateral requirement
+Guarantor requirement
+
+7. Loan Application
+
+Loan lifecycle:
+
+Draft
+  ↓
+Submitted
+  ↓
+KYC Check
+  ↓
+Credit Assessment
+  ↓
+Approval
+  ↓
+Approved
+  ↓
+Disbursement
+
+Features:
+
+Loan application
+Loan officer assignment
+Requested amount
+Loan purpose
+Income assessment
+Expense assessment
+Existing debt
+Credit score
+Guarantor
+Collateral
+Supporting documents
+
+
+8. Credit Assessment
+Credit scoring
+Debt-to-income ratio
+Repayment capacity
+Existing loan check
+Credit history
+Customer risk level
+Internal credit score
+External credit bureau integration
+
+Example:
+
+Monthly Income       1,000,000
+Monthly Expenses       500,000
+Existing Repayment     100,000
+--------------------------------
+Available Income       400,000
+
+9. Loan Approval / Workflow
+
+Support multi-level approval.
+
+Loan Officer
+     ↓
+Branch Manager
+     ↓
+Credit Manager
+     ↓
+Head Office
+
+Depending on loan amount:
+
+< 1,000,000       → Branch Manager
+1M - 10M          → Credit Manager
+> 10M             → Head Office
+
+Features:
+
+Approval rules
+Approval limits
+Approval queue
+Approve
+Reject
+Return for correction
+Approval comments
+Maker/checker
+
+10. Loan Disbursement
+Disbursement request
+Disbursement approval
+Cash disbursement
+Bank transfer
+Mobile wallet
+Partial disbursement
+Disbursement receipt
+
+Channels:
+
+CASH
+BANK
+MOBILE_WALLET
+
+11. Loan Schedule / Amortization
+
+Automatically generate repayment schedules.
+
+Example:
+
+Loan Amount:      1,000,000
+Interest:             2%
+Term:                12 months
+Frequency:       Monthly
+
+Schedule:
+
+Installment  Due Date      Principal   Interest   Total
+--------------------------------------------------------
+1            2026-09-01    80,000      20,000    100,000
+2            2026-10-01    82,000      18,000    100,000
+3            2026-11-01    84,000      16,000    100,000
+...
+
+Your system should support:
+
+Flat interest
+Reducing balance
+Equal installment
+Principal + interest
+Daily / weekly / monthly schedules
+
+12. Repayment / Collection
+
+Core transaction module.
+
+Loan repayment
+Partial repayment
+Full repayment
+Advance repayment
+Principal payment
+Interest payment
+Fee payment
+Penalty payment
+Cash collection
+Bank collection
+Mobile wallet collection
+Receipt generation
+
+13. Collection Management
+
+Especially important for field-based microfinance.
+
+Branch
+ ↓
+Loan Officer
+ ↓
+Collection Route
+ ↓
+Customer / Group
+ ↓
+Collection
+
+Features:
+
+Collection schedule
+Daily collection
+Field collection
+Collection officer assignment
+Route management
+Cash collection
+Collection receipt
+Cash reconciliation
+
+14. Delinquency & Collections
+
+Track overdue loans.
+
+Statuses:
+
+CURRENT
+LATE
+OVERDUE
+PAR
+DEFAULT
+WRITTEN_OFF
+
+Features:
+
+Overdue tracking
+Aging
+Collection reminders
+Promise to pay
+Collection activities
+Customer visits
+Phone follow-up
+Recovery actions
+Write-off
+
+15. Savings / Deposit Management
+
+If your microfinance institution provides savings.
+
+Products:
+
+Compulsory Savings
+Voluntary Savings
+Regular Savings
+Term Deposit
+
+Features:
+
+Savings account
+Deposit
+Withdrawal
+Transfer
+Interest calculation
+Savings statement
+Minimum balance
+Account closure
+
+16. Cash & Teller Management
+
+For branches.
+
+Teller accounts
+Cash opening balance
+Cash deposits
+Cash withdrawals
+Cash transfer
+Cash reconciliation
+End-of-day closing
+Cash limits
+Vault management
+
+Example:
+
+Branch Cash
+    ↓
+Vault
+    ↓
+Teller 001
+Teller 002
+Teller 003
+
+17. Accounting / General Ledger
+
+This becomes very important as the system grows.
+
+Core modules:
+
+Chart of accounts
+Journal entries
+General ledger
+Branch accounting
+Cash accounts
+Bank accounts
+Accounts receivable
+Accounts payable
+Trial balance
+Profit & loss
+Balance sheet
+
+Example loan disbursement:
+
+Dr. Loan Receivable       1,000,000
+    Cr. Cash              1,000,000
+
+Repayment:
+
+Dr. Cash                    100,000
+    Cr. Principal            80,000
+    Cr. Interest             20,000
+
+
+18. Fees & Charges
+
+Centralize fee configuration.
+
+Processing fee
+Application fee
+Late fee
+Penalty
+Service fee
+Withdrawal fee
+Transfer fee
+Insurance fee
+
+19. Collateral Management
+
+For secured lending.
+
+Collateral registration
+Collateral type
+Estimated value
+Ownership
+Valuation
+Documents
+Collateral release
+Collateral seizure
+
+Example:
+
+PROPERTY
+VEHICLE
+GOLD
+EQUIPMENT
+DEPOSIT
+
+
+20. Guarantor Management
+Guarantor registration
+Guarantor KYC
+Relationship
+Guarantee amount
+Guarantee status
+Guarantor liability
+Guarantor documents
+
+
+21. Document Management
+
+Central document storage.
+
+Customer
+ ├── NRC
+ ├── Passport
+ ├── Photo
+ ├── Signature
+ └── Address Proof
+
+Loan
+ ├── Application
+ ├── Agreement
+ ├── Guarantor
+ └── Collateral
+
+Can later integrate with:
+
+S3
+Azure Blob
+Google Cloud Storage
+
+
+22. Notifications
+
+Channels:
+
+SMS
+Email
+Push Notification
+WhatsApp
+
+Events:
+
+Loan approved
+Loan disbursed
+Payment reminder
+Payment received
+Overdue notification
+KYC expiry
+Account notification
+
+23. Reporting & Dashboard
+Management Dashboard
+Total Customers
+Active Customers
+Active Loans
+Outstanding Portfolio
+Today's Collection
+Overdue Amount
+PAR
+NPL
+Savings
+Cash Balance
+Reports
+Customer report
+Loan portfolio
+Disbursement report
+Repayment report
+Collection report
+Outstanding report
+PAR report
+Aging report
+Branch performance
+Loan officer performance
+Savings report
+Cash report
+GL report
+P&L
+Balance sheet
+
+
+24. Audit & Compliance
+
+Very important for financial systems.
+
+Audit log
+Login history
+Transaction history
+User activity
+Data change history
+Approval history
+Reversal history
+Suspicious transaction monitoring
+KYC compliance
+Regulatory reporting
+
+Example:
+
+Who:
+    Loan Officer A
+
+Action:
+    APPROVED_LOAN
+
+Loan:
+    LN-2026-000123
+
+Old Status:
+    PENDING
+
+New Status:
+    APPROVED
+
+Date:
+    2026-08-11 10:30
+
+
+25. System Configuration
+
+Central configuration:
+
+Organization settings
+Branch settings
+Currency
+Interest rates
+Loan rules
+Number sequences
+Holiday calendar
+Business days
+Notification settings
+Approval rules
+Accounting configuration
+
+
+Recommended MVP
+
+For your NestJS + Prisma + PostgreSQL project, I wouldn't build all 25 modules initially.
+
+I'd start with these 10 core modules:
+
+01. Auth & RBAC
+02. Organization & Branch
+03. Customer
+04. KYC
+05. Loan Product
+06. Loan Application
+07. Loan Approval
+08. Loan Disbursement
+09. Loan Repayment
+10. Reporting
+
+Then Phase 2:
+
+11. Collection
+12. Delinquency
+13. Savings
+14. Cash/Teller
+15. Accounting/GL
+16. Collateral
+17. Guarantor
+18. Notifications
+19. Document Management
+20. Audit & Compliance
+
+
+src/
+├── auth/
+├── users/
+├── roles/
+├── permissions/
+│
+├── organization/
+├── branches/
+├── employees/
+│
+├── customers/
+├── kyc/
+├── customer-groups/
+│
+├── loan-products/
+├── loan-applications/
+├── credit-assessment/
+├── loan-approvals/
+├── loans/
+├── loan-schedules/
+├── loan-disbursements/
+├── repayments/
+├── collections/
+├── delinquency/
+│
+├── savings/
+├── cash/
+├── accounting/
+├── fees/
+│
+├── collateral/
+├── guarantors/
+├── documents/
+│
+├── notifications/
+├── reports/
+├── audit/
+│
+└── prisma/
