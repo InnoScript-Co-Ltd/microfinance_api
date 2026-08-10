@@ -1,10 +1,9 @@
 import { Global, Module } from '@nestjs/common';
-import { SnowflakeId } from '../../common/helpers/helper.snowflake';
 import { SnowflakeService } from './snowflake.service';
 
 @Global()
 @Module({
-  providers: [SnowflakeId],
+  providers: [],
   exports: [SnowflakeService],
 })
 export class SnowflakeModule {}
