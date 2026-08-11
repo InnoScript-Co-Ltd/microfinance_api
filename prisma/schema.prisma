@@ -11,18 +11,449 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../docs/erd.svg"
+}
+
+enum CustomerType {
+  INDIVIDUAL
+  BUSINESS
+  GROUP
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum CustomerStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  BLOCKED
+  CLOSED
+}
 
 model Customer {
-  id BigInt @id
-  customerNo String @unique @db.VarChar(30)
-  firstName String @db.VarChar(100)
-  lastName String @db.VarChar(100)
-  phone String @unique @db.VarChar(30)
-  email String @unique @db.VarChar(150)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            BigInt         @id
+  branchId      BigInt
+  customerNo    String         @unique @db.VarChar(30)
+  customerType  CustomerType   @default(INDIVIDUAL)
+  firstName     String         @db.VarChar(100)
+  lastName      String         @db.VarChar(100)
+  profile       String?        @db.VarChar(150)
+  gender        Gender         @default(PREFER_NOT_TO_SAY)
+  dateOfBirth   DateTime?      @db.Date
+  nationality   String?        @db.VarChar(100)
+  maritalStatus String?        @db.VarChar(50)
+  phone         String         @unique @db.VarChar(30)
+  email         String         @unique @db.VarChar(150)
+  occupation    String?        @db.VarChar(150)
+  status        CustomerStatus @default(PENDING)
+  registeredAt  DateTime       @default(now())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
 
-  @@index([id, phone, email])
-  @@index([createdAt])
+  branch Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  auth       CustomerAuth?
+  otps       CustomerOtp[]
+  sessions   CustomerSession[]
+  kyc        CustomerKyc?
+  documents  CustomerDocument[]
+  addresses  CustomerAddress[]
+  contacts   CustomerContact[]
+  employment CustomerEmployment?
+
+  @@index([customerNo])
+  @@index([phone])
+  @@index([email])
+  @@index([status])
+  @@index([branchId])
+  @@map("customers")
 }
- 
+
+enum PhoneOrEmailVerifiedStatus {
+  PENDING
+  VERIFIED
+}
+
+enum CustomerAuthStatus {
+  PENDING
+  ACTIVE
+  LOCKED
+  SUSPENDED
+  DISABLED
+}
+
+model CustomerAuth {
+  id                  BigInt                     @id
+  customerId          BigInt                     @unique
+  username            String?                    @unique @db.VarChar(100)
+  passwordHash        String?                    @db.VarChar(255)
+  pinHash             String?                    @db.VarChar(255)
+  phoneVerified       PhoneOrEmailVerifiedStatus @default(PENDING)
+  phoneVerifiedAt     DateTime?
+  emailVerified       PhoneOrEmailVerifiedStatus @default(PENDING)
+  emailVerifiedAt     DateTime?
+  twoFactorEnabled    Boolean                    @default(false)
+  failedLoginAttempts Int                        @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  lastLoginIp         String?                    @db.VarChar(45)
+  passwordChangedAt   DateTime?
+  pinChangedAt        DateTime?
+  status              CustomerAuthStatus         @default(PENDING)
+  createdAt           DateTime                   @default(now())
+  updatedAt           DateTime                   @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([status])
+  @@map("customer_auth")
+}
+
+enum OtpChannel {
+  SMS
+  EMAIL
+}
+
+enum OtpPurpose {
+  REGISTRATION
+  LOGIN
+  VERIFY_PHONE
+  VERIFY_EMAIL
+  RESET_PASSWORD
+  RESET_PIN
+  CHANGE_PHONE
+  CHANGE_EMAIL
+}
+
+enum OtpStatus {
+  PENDING
+  VERIFIED
+  EXPIRED
+  FAILED
+}
+
+model CustomerOtp {
+  id          BigInt     @id
+  customerId  BigInt?
+  channel     OtpChannel
+  prupose     OtpPurpose
+  destination String     @db.VarChar(255)
+  codeHash    String     @db.VarChar(255)
+  status      OtpStatus  @default(PENDING)
+  attempts    Int        @default(0)
+  maxAttempts Int        @default(5)
+  expiredAt   DateTime
+  verifiedAt  DateTime?
+  ipAddress   String?    @db.VarChar(45)
+  createdAt   DateTime   @default(now())
+
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([destination])
+  @@index([prupose])
+  @@index([status])
+  @@index([expiredAt])
+  @@map("customer_otps")
+}
+
+model CustomerSession {
+  id               BigInt    @id
+  customerId       BigInt
+  refreshTokenHash String    @db.VarChar(255)
+  deviceId         String?   @db.VarChar(255)
+  deviceName       String?   @db.VarChar(255)
+  ipAddress        String?   @db.VarChar(45)
+  userAgent        String?   @db.VarChar(500)
+  expiredAt        DateTime
+  revokedAt        DateTime?
+  lastUserAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([expiredAt])
+  @@index([revokedAt])
+  @@map("customer_sessions")
+}
+
+enum KycLevel {
+  BASIC
+  STANDARD
+  ENHANCED
+}
+
+enum KycStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+enum VerificationMethod {
+  MANUAL
+  OCR
+  E_KYC
+  BIOMETRIC
+  THIRD_PARTY
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model CustomerKyc {
+  id                 BigInt              @id
+  customerId         BigInt              @unique
+  kycLevel           KycLevel            @default(BASIC)
+  status             KycStatus           @default(PENDING)
+  verificationMethod VerificationMethod?
+  nationalId         String?             @db.VarChar(100)
+  passportNo         String?             @db.VarChar(100)
+  idIssuedDate       DateTime?           @db.Date
+  idExpiryDate       DateTime?           @db.Date
+  idIssuedCountry    String?             @db.VarChar(100)
+  submittedAt        DateTime?
+  reviewedAt         DateTime?
+  verifiedAt         DateTime?
+  verifiedBy         BigInt?
+  rejectionReason    String?
+  reviewNote         String?
+  riskLevel          RiskLevel           @default(LOW)
+  isPep              Boolean             @default(false)
+  isSanctioned       Boolean             @default(false)
+  isBlacklisted      Boolean             @default(false)
+  riskScore          Decimal?            @db.Decimal(8, 2)
+  dataConsent        Boolean             @default(false)
+  marketingConsent   Boolean             @default(false)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  deletedAt          DateTime?
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  documents CustomerDocument[]
+
+  @@index([status])
+  @@index([kycLevel])
+  @@index([nationalId])
+  @@index([passportNo])
+  @@index([riskLevel])
+  @@index([isPep])
+  @@index([isSanctioned])
+  @@map("customer_kycs")
+}
+
+enum KycDocumentType {
+  NATIONAL_ID_FRONT
+  NATIONAL_ID_BACK
+  PASSPORT
+  DRIVING_LICENSE
+  RESIDENCE_PERMIT
+  WORK_PERMIT
+  SELFIE
+  ADDRESS_PROOF
+  INCOME_PROOF
+  BUSINESS_LICENSE
+  OTHER
+}
+
+enum DocumentVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+model CustomerDocument {
+  id                 BigInt                     @id
+  customerId         BigInt
+  kycId              BigInt?
+  documentType       KycDocumentType
+  documentNumber     String?                    @db.VarChar(100)
+  fileName           String?                    @db.VarChar(255)
+  fileKey            String                     @db.VarChar(500)
+  mimeType           String?                    @db.VarChar(100)
+  fileSize           BigInt?
+  issuedDate         DateTime?                  @db.Date
+  expiryDate         DateTime?                  @db.Date
+  issuedCountry      String?                    @db.VarChar(100)
+  verificationStatus DocumentVerificationStatus @default(PENDING)
+  verifiedAt         DateTime?
+  verifiedBy         BigInt?
+  rejectionReason    String?
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  customer Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  kyc      CustomerKyc? @relation(fields: [kycId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([kycId])
+  @@index([documentType])
+  @@index([verificationStatus])
+  @@map("customer_documents")
+}
+
+enum CustomerAddressType {
+  CURRENT
+  PERMANENT
+  WORK
+  BUSINESS
+  OTHER
+}
+
+model CustomerAddress {
+  id           BigInt              @id
+  customerId   BigInt
+  addressType  CustomerAddressType
+  addressLine1 String              @db.VarChar(255)
+  addressLine2 String?             @db.VarChar(255)
+  houseNo      String?             @db.VarChar(50)
+  street       String?             @db.VarChar(150)
+  village      String?             @db.VarChar(150)
+  ward         String?             @db.VarChar(150)
+  township     String?             @db.VarChar(150)
+  district     String?             @db.VarChar(150)
+  region       String?             @db.VarChar(150)
+  city         String?             @db.VarChar(150)
+  state        String?             @db.VarChar(150)
+  country      String              @db.VarChar(150)
+  postalCode   String?             @db.VarChar(150)
+  latitude     Decimal?            @db.Decimal(10, 7)
+  longitude    Decimal?            @db.Decimal(10, 7)
+  isPrimary    Boolean             @default(false)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  deletedAt    DateTime?
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([addressType])
+  @@index([township])
+  @@index([district])
+  @@index([region])
+  @@index([country])
+  @@map("customer_addresses")
+}
+
+enum CustomerContactType {
+  EMERGENCY
+  SPOUSE
+  PARENT
+  CHILD
+  SIBLING
+  GUARDIAN
+  RELATIVE
+  FRIEND
+  OTHER
+}
+
+model CustomerContact {
+  id             BigInt              @id
+  customerId     BigInt
+  contactType    CustomerContactType
+  name           String              @db.VarChar(150)
+  relationship   String?             @db.VarChar(100)
+  phone          String?             @db.VarChar(30)
+  alternatePhone String?             @db.VarChar(30)
+  email          String?             @db.VarChar(255)
+  address        String?             @db.VarChar(500)
+  isPrimary      Boolean             @default(false)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  deletedAt      DateTime?
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([contactType])
+  @@index([phone])
+  @@map("customer_contacts")
+}
+
+enum EmploymentType {
+  EMPLOYED
+  SELF_EMPLOYED
+  BUSINESS_OWNER
+  FARMER
+  FISHERMAN
+  DAILY_WORKER
+  STUDENT
+  UNEMPLOYED
+  RETIRED
+  OTHER
+}
+
+model CustomerEmployment {
+  id              BigInt         @id
+  customerId      BigInt         @unique
+  employmentType  EmploymentType
+  employerName    String?        @db.VarChar(200)
+  jobTitle        String?        @db.VarChar(150)
+  businessName    String?        @db.VarChar(200)
+  businessType    String?        @db.VarChar(150)
+  businessAddress String?        @db.VarChar(500)
+  yearExperience  Decimal?       @db.Decimal(5, 2)
+  monthlyIncome   Decimal?       @db.Decimal(18, 2)
+  monthlyExpenses Decimal?       @db.Decimal(18, 2)
+  incomeSource    String?        @db.VarChar(200)
+  employerPhone   String?        @db.VarChar(30)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+  customer        Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([employmentType])
+  @@map("customer_employments")
+}
+
+enum BranchStatus {
+  ACTIVE
+  TEMPORY_CLOSE
+  INACTIVE
+}
+
+model Branch {
+  id         BigInt       @id
+  branchCode String       @unique @db.VarChar(30)
+  name       String       @db.VarChar(150)
+  phone      String?      @db.VarChar(30)
+  address    String?
+  latitude   Decimal?     @db.Decimal(10, 7)
+  longitude  Decimal?     @db.Decimal(10, 7)
+  country    String       @db.VarChar(100)
+  region     String?      @db.VarChar(150)
+  distruct   String?      @db.VarChar(150)
+  city       String?      @db.VarChar(150)
+  township   String?      @db.VarChar(150)
+  postalCode String?      @db.VarChar(20)
+  status     BranchStatus @default(ACTIVE)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  deletedAt  DateTime?
+
+  customers Customer[]
+
+  @@index([branchCode])
+  @@index([status])
+  @@index([country])
+  @@index([region])
+  @@index([distruct])
+  @@index([city])
+  @@index([township])
+  @@map("branches")
+}
